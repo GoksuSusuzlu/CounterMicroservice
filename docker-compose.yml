@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  webapi:
+    build: .
+    ports:
+      - "8080:80"
+    depends_on:
+      - db
+    environment:
+      - ConnectionStrings__DefaultConnection=Server=db;Database=CounterMicroservice;User Id=sa;Password=YourStrong!Passw0rd;
+
+  db:
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    environment:
+      SA_PASSWORD: "YourStrong!Passw0rd"
+      ACCEPT_EULA: "Y"
+    ports:
+      - "1433:1433"
+
+  migrate:
+    build: .
+    command: ["dotnet", "ef", "database", "update", "--project", "src/counterMicroservice/WebAPI/WebAPI.csproj"]
+    depends_on:
+      - db
+    environment:
+      - ConnectionStrings__DefaultConnection=Server=db;Database=CounterMicroservice;User Id=sa;Password=YourStrong!Passw0rd;
