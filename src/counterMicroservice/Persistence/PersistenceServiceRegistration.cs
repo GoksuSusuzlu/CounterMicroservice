@@ -13,7 +13,9 @@ public static class PersistenceServiceRegistration
     public static IServiceCollection AddPersistenceServices(this IServiceCollection services, IConfiguration configuration)
     {
         //services.AddDbContext<BaseDbContext>(options => options.UseInMemoryDatabase("BaseDb"));
-        services.AddDbContext<BaseDbContext>(options => options.UseSqlServer(configuration["ConnectionStrings__DefaultConnection"] ?? configuration.GetConnectionString("BaseDb")));
+        var connectionstring = configuration["ConnectionStrings__DefaultConnection"];
+        var connectionstringlocal = configuration.GetConnectionString("DockerDb");
+        services.AddDbContext<BaseDbContext>(options => options.UseSqlServer(configuration["ConnectionStrings__DefaultConnection"] ?? configuration.GetConnectionString("DockerDb")));
         services.AddDbMigrationApplier(buildServices => buildServices.GetRequiredService<BaseDbContext>());
 
         services.AddScoped<IEmailAuthenticatorRepository, EmailAuthenticatorRepository>();

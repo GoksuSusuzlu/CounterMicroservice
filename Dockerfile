@@ -25,5 +25,8 @@ COPY --from=build /out .
 # Expose the port the app runs on
 EXPOSE 80
 
+# SQL Server trusted connection problem
+RUN sed -i 's/DEFAULT@SECLEVEL=2/DEFAULT@SECLEVEL=1/g' /etc/ssl/openssl.cnf
+
 # Default entrypoint for the web application
 ENTRYPOINT ["dotnet", "WebAPI.dll"]
