@@ -7,8 +7,16 @@ services:
       - "80:80"
     depends_on:
       - db
+      - rabbitmq
     environment:
       - ConnectionStrings__DefaultConnection=Server=db;Database=CounterMicroservice;User Id=sa;Password=YourStrong!Passw0rd;
+      - RabbitMQ__HostName=rmq
+      - RabbitMQ__Port=5672
+      - RabbitMQ__UserName=guest
+      - RabbitMQ__Password=guest
+    networks:
+      - mynetwork
+
 
   db:
     image: mcr.microsoft.com/mssql/server:2019-latest
@@ -17,11 +25,37 @@ services:
       ACCEPT_EULA: "Y"
     ports:
       - "1433:1433"
+    networks:
+      - mynetwork
+
+  rabbitmq:
+    image: "rabbitmq:3-management"
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    hostname: rmq
+    ports:
+      - "15672:15672"  # Management UI
+      - "5672:5672"    # AMQP protocol
+    networks:
+      - mynetwork
 
   migrate:
     build: .
     command: ["dotnet", "ef", "database", "update", "--project", "src/counterMicroservice/WebAPI/WebAPI.csproj"]
     depends_on:
       - db
+      - rabbitmq
     environment:
       - ConnectionStrings__DefaultConnection=Server=db;Database=CounterMicroservice;User Id=sa;Password=YourStrong!Passw0rd;
+      - RabbitMQ__HostName=rmq
+      - RabbitMQ__Port=5672
+      - RabbitMQ__UserName=guest
+      - RabbitMQ__Password=guest
+    networks:
+      - mynetwork
+
+networks:
+  mynetwork:
+    name: mynetwork
+    external: true
