@@ -85,6 +85,8 @@ builder.Services.AddSwaggerGen(opt =>
     opt.OperationFilter<BearerSecurityRequirementOperationFilter>();
 });
 
+builder.WebHost.UseUrls("http://*:80"); // Bind to port 80 for all network interfaces
+
 WebApplication app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -114,14 +116,5 @@ WebApiConfiguration webApiConfiguration =
 app.UseCors(opt => opt.WithOrigins(webApiConfiguration.AllowedOrigins).AllowAnyHeader().AllowAnyMethod().AllowCredentials());
 
 app.UseResponseLocalization();
-
-//added for docker container to run the migrations
-using (var scope = app.Services.CreateScope())
-{
-    var services = scope.ServiceProvider;
-
-    var context = services.GetRequiredService<BaseDbContext>();
-    context.Database.Migrate();
-}
 
 app.Run();
