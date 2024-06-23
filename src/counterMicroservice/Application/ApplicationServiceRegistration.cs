@@ -20,6 +20,7 @@ using NArchitecture.Core.Mailing;
 using NArchitecture.Core.Mailing.MailKit;
 using Application.Services.Counters;
 using Application.Services.RabbitMQResponderService;
+using Application.Services.Repositories;
 
 namespace Application;
 
@@ -56,7 +57,7 @@ public static class ApplicationServiceRegistration
         services.AddScoped<IAuthenticatorService, AuthenticatorManager>();
         services.AddScoped<IUserService, UserManager>();
 
-        services.AddSingleton<ICounterService, CounterManager>();
+        services.AddScoped<ICounterService, CounterManager>();
         services.AddHostedService<RabbitMQResponderService>();
 
         services.AddYamlResourceLocalization();
